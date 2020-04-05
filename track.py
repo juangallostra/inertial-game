@@ -21,7 +21,11 @@ class GameTrackGenerator():
         for i in range(point_count):
             x = rn.randrange(margin, WIDTH - margin + 1, 1)
             y = rn.randrange(margin, HEIGHT -margin + 1, 1)
-            distances = list(filter(lambda x: x < min_distance, [math.sqrt((p[0]-x)**2 + (p[1]-y)**2) for p in points]))
+            distances = list(
+                filter(
+                    lambda x: x < min_distance, [math.sqrt((p[0]-x)**2 + (p[1]-y)**2) for p in points]
+                )
+            )
             if len(distances) == 0:
                 points.append((x, y))
         return np.array(points)
@@ -36,7 +40,13 @@ class GameTrackGenerator():
         mag = sum(x**2 for x in vec) ** .5
         return [x/mag for x in vec]
 
-    def shape_track(self, track_points, difficulty=DIFFICULTY, max_displacement=MAX_DISPLACEMENT, margin=MARGIN):
+    def shape_track(
+        self,
+        track_points,
+        difficulty=DIFFICULTY,
+        max_displacement=MAX_DISPLACEMENT,
+        margin=MARGIN
+    ):
         track_set = [[0,0] for i in range(len(track_points)*2)] 
         for i in range(len(track_points)):
             displacement = math.pow(rn.random(), difficulty) * max_displacement
@@ -111,7 +121,12 @@ class GameTrackGenerator():
             points[next_point][1] = int(points[i][1] + new_y)
         return points
 
-    def get_corners_with_kerb(self, points, min_kerb_angle=MIN_KERB_ANGLE, max_kerb_angle=MAX_KERB_ANGLE):
+    def get_corners_with_kerb(
+        self,
+        points,
+        min_kerb_angle=MIN_KERB_ANGLE,
+        max_kerb_angle=MAX_KERB_ANGLE
+    ):
         require_kerb = []
         for i in range(len(points)):
             if i > 0:
@@ -245,11 +260,17 @@ class GameTrackGenerator():
         # rotate and place starting grid
         offset = TRACK_POINT_ANGLE_OFFSET
         vec_p = [points[offset][1] - points[0][1], -(points[offset][0] - points[0][0])]
-        n_vec_p = [vec_p[0] / math.hypot(vec_p[0], vec_p[1]), vec_p[1] / math.hypot(vec_p[0], vec_p[1])]
+        n_vec_p = [
+            vec_p[0] / math.hypot(vec_p[0], vec_p[1]),
+            vec_p[1] / math.hypot(vec_p[0], vec_p[1])
+        ]
         # compute angle
         angle = math.degrees(math.atan2(n_vec_p[1], n_vec_p[0]))
         rot_grid = pygame.transform.rotate(starting_grid, -angle)
-        start_pos = (points[0][0] - math.copysign(1, n_vec_p[0])*n_vec_p[0] * radius, points[0][1] - math.copysign(1, n_vec_p[1])*n_vec_p[1] * radius)    
+        start_pos = (
+            points[0][0] - math.copysign(1, n_vec_p[0])*n_vec_p[0] * radius,
+            points[0][1] - math.copysign(1, n_vec_p[1])*n_vec_p[1] * radius
+        )    
         surface.blit(rot_grid, start_pos)
 
     def draw_starting_grid(self, track_width):
@@ -268,8 +289,14 @@ class GameTrackGenerator():
         radius = TRACK_WIDTH // 2 + margin
         offset = CHECKPOINT_POINT_ANGLE_OFFSET
         check_index = points.index(checkpoint)
-        vec_p = [points[check_index + offset][1] - points[check_index][1], -(points[check_index+offset][0] - points[check_index][0])]
-        n_vec_p = [vec_p[0] / math.hypot(vec_p[0], vec_p[1]), vec_p[1] / math.hypot(vec_p[0], vec_p[1])]
+        vec_p = [
+            points[check_index + offset][1] - points[check_index][1],
+            -(points[check_index+offset][0] - points[check_index][0])
+        ]
+        n_vec_p = [
+            vec_p[0] / math.hypot(vec_p[0], vec_p[1]),
+            vec_p[1] / math.hypot(vec_p[0], vec_p[1])
+        ]
         # compute angle
         angle = math.degrees(math.atan2(n_vec_p[1], n_vec_p[0]))
         # draw checkpoint
@@ -277,7 +304,10 @@ class GameTrackGenerator():
         rot_checkpoint = pygame.transform.rotate(checkpoint, -angle)
         if debug:
             rot_checkpoint.fill(RED)
-        check_pos = (points[check_index][0] - math.copysign(1, n_vec_p[0])*n_vec_p[0] * radius, points[check_index][1] - math.copysign(1, n_vec_p[1])*n_vec_p[1] * radius)    
+        check_pos = (
+            points[check_index][0] - math.copysign(1, n_vec_p[0])*n_vec_p[0] * radius,
+            points[check_index][1] - math.copysign(1, n_vec_p[1])*n_vec_p[1] * radius
+        )    
         track_surface.blit(rot_checkpoint, check_pos)
 
     def draw_rectangle(self, dimensions, color, line_thickness=1, fill=False):
@@ -299,11 +329,23 @@ class GameTrackGenerator():
             last_kerb = None
             for i in range(0, len(corner), step):
                 # parallel vector
-                vec_p = [temp_corner[i+offset][0] - temp_corner[i][0], temp_corner[i+offset][1] - temp_corner[i][1]]
-                n_vec_p = [vec_p[0] / math.hypot(vec_p[0], vec_p[1]), vec_p[1] / math.hypot(vec_p[0], vec_p[1])]
+                vec_p = [
+                    temp_corner[i+offset][0] - temp_corner[i][0],
+                    temp_corner[i+offset][1] - temp_corner[i][1]
+                ]
+                n_vec_p = [
+                    vec_p[0] / math.hypot(vec_p[0], vec_p[1]),
+                    vec_p[1] / math.hypot(vec_p[0], vec_p[1])
+                ]
                 # perpendicular vector
-                vec_perp = [temp_corner[i+offset][1] - temp_corner[i][1], -(temp_corner[i+offset][0] - temp_corner[i][0])]
-                n_vec_perp = [vec_perp[0] / math.hypot(vec_perp[0], vec_perp[1]), vec_perp[1] / math.hypot(vec_perp[0], vec_perp[1])]
+                vec_perp = [
+                    temp_corner[i+offset][1] - temp_corner[i][1],
+                    -(temp_corner[i+offset][0] - temp_corner[i][0])
+                ]
+                n_vec_perp = [
+                    vec_perp[0] / math.hypot(vec_perp[0], vec_perp[1]),
+                    vec_perp[1] / math.hypot(vec_perp[0], vec_perp[1])
+                ]
                 # compute angle
                 angle = math.degrees(math.atan2(n_vec_p[1], n_vec_p[0]))
                 kerb = self.draw_single_kerb()
@@ -319,7 +361,10 @@ class GameTrackGenerator():
                 if last_kerb is None:
                     last_kerb = start_pos
                 else:
-                    if math.hypot(start_pos[0] - last_kerb[0], start_pos[1]-last_kerb[1]) >= track_width:
+                    if math.hypot(
+                        start_pos[0] - last_kerb[0],
+                        start_pos[1] - last_kerb[1]
+                    ) >= track_width:
                         continue
                 last_kerb = start_pos
                 track_surface.blit(rot_kerb, start_pos)
