@@ -45,8 +45,8 @@ class GameTrackGenerator():
             track_set[i*2 + 1][0] = int((track_points[i][0] + track_points[(i+1)%len(track_points)][0]) / 2 + disp[0])
             track_set[i*2 + 1][1] = int((track_points[i][1] + track_points[(i+1)%len(track_points)][1]) / 2 + disp[1])
         for i in range(3):
-            track_set = fix_angles(track_set)
-            track_set = push_points_apart(track_set)
+            track_set = self.fix_angles(track_set)
+            track_set = self.push_points_apart(track_set)
         # push any point outside screen limits back again
         final_set = []
         for point in track_set:
@@ -155,7 +155,7 @@ class GameTrackGenerator():
     def get_full_corners(self, track_points, corners):
         # get full range of points that conform the corner
         offset = FULL_CORNER_NUM_POINTS
-        corners_in_track = get_corners_from_kp(track_points, corners)
+        corners_in_track = self.get_corners_from_kp(track_points, corners)
         # for each corner keypoint in smoothed track, 
         # get the set of points that make the corner.
         # This are the offset previous and offset next points
@@ -171,7 +171,7 @@ class GameTrackGenerator():
 
     def get_corners_from_kp(self, complete_track, corner_kps):
         # for each detected corner find closest point in final track (smoothed track)
-        return [find_closest_point(complete_track, corner) for corner in corner_kps]
+        return [self.find_closest_point(complete_track, corner) for corner in corner_kps]
 
     def find_closest_point(self, points, keypoint):
         min_dist = None
@@ -233,7 +233,7 @@ class GameTrackGenerator():
     def draw_track(self, surface, color, points, corners):
         radius = TRACK_WIDTH // 2
         # draw kerbs
-        draw_corner_kerbs(surface, corners, radius)
+        self.draw_corner_kerbs(surface, corners, radius)
         # draw track
         chunk_dimensions = (radius * 2, radius * 2)
         for point in points:
@@ -241,7 +241,7 @@ class GameTrackGenerator():
             track_chunk = pygame.Surface(chunk_dimensions, pygame.SRCALPHA)
             pygame.draw.circle(track_chunk, color, (radius, radius), radius)
             surface.blit(track_chunk, blit_pos)
-        starting_grid = draw_starting_grid(radius*2)
+        starting_grid = self.draw_starting_grid(radius*2)
         # rotate and place starting grid
         offset = TRACK_POINT_ANGLE_OFFSET
         vec_p = [points[offset][1] - points[0][1], -(points[offset][0] - points[0][0])]
@@ -306,7 +306,7 @@ class GameTrackGenerator():
                 n_vec_perp = [vec_perp[0] / math.hypot(vec_perp[0], vec_perp[1]), vec_perp[1] / math.hypot(vec_perp[0], vec_perp[1])]
                 # compute angle
                 angle = math.degrees(math.atan2(n_vec_p[1], n_vec_p[0]))
-                kerb = draw_single_kerb()
+                kerb = self.draw_single_kerb()
                 rot_kerb = pygame.transform.rotate(kerb, -angle)
                 m_x = 1
                 m_y = 1
