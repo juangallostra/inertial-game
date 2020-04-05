@@ -9,7 +9,7 @@ from scipy import interpolate
 
 from constants import *
 
-class GameTrack():
+class GameTrackGenerator():
     def __init__(self):
         self._track_points = []
         self._checkpoints = []
