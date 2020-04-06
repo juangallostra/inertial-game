@@ -11,10 +11,22 @@ from constants import *
 
 class GameTrackGenerator():
     def __init__(self, screen):
+        self._screen = screen
+        
         self._track_points = []
         self._checkpoints = []
-        self._screen = screen
+        self._track_start = None
 
+    def get_track_points(self):
+        return self._track_points
+
+    def get_track_checkpoints(self):
+        return self._checkpoints
+
+    def get_track_start(self):
+        return self._track_start
+
+    # track generation methods
     def generate_track(self, debug=False, draw_checkpoints_in_track=False):
         # generate the track
         points = self.random_points()
@@ -42,13 +54,6 @@ class GameTrackGenerator():
             self.draw_lines_from_points(self._screen, BLUE, track_points)    
             self.draw_points(self._screen, BLACK, f_points)
 
-    def get_track_points(self):
-        return self._track_points
-
-    def get_track_checkpoints(self):
-        return self._checkpoints
-
-    # track generation methods
     def random_points(self, min=MIN_POINTS, max=MAX_POINTS, margin=MARGIN, min_distance=MIN_DISTANCE):
         point_count = rn.randrange(min, max+1, 1)
         points = []
@@ -242,6 +247,33 @@ class GameTrackGenerator():
             checkpoints.append(track_points[index])
         return checkpoints
 
+    def compute_checkpoint(self, points, checkpoint, debug=False):
+        # given the main point of a checkpoint, compute and draw the checkpoint box
+        margin = CHECKPOINT_MARGIN
+        radius = TRACK_WIDTH // 2 + margin
+        offset = CHECKPOINT_POINT_ANGLE_OFFSET
+        check_index = points.index(checkpoint)
+        vec_p = [
+            points[check_index + offset][1] - points[check_index][1],
+            -(points[check_index+offset][0] - points[check_index][0])
+        ]
+        n_vec_p = [
+            vec_p[0] / math.hypot(vec_p[0], vec_p[1]),
+            vec_p[1] / math.hypot(vec_p[0], vec_p[1])
+        ]
+        # compute angle
+        angle = math.degrees(math.atan2(n_vec_p[1], n_vec_p[0]))
+        # draw checkpoint
+        checkpoint = self.draw_rectangle((radius*2, 5), BLUE, line_thickness=1, fill=False)
+        rot_checkpoint = pygame.transform.rotate(checkpoint, -angle)
+        if debug:
+            rot_checkpoint.fill(RED)
+        check_pos = (
+            points[check_index][0] - math.copysign(1, n_vec_p[0])*n_vec_p[0] * radius,
+            points[check_index][1] - math.copysign(1, n_vec_p[1])*n_vec_p[1] * radius
+        )
+        return (rot_checkpoint, check_pos)
+
     ####
     ## drawing functions
     ####
@@ -306,6 +338,8 @@ class GameTrackGenerator():
             points[0][1] - math.copysign(1, n_vec_p[1])*n_vec_p[1] * radius
         )    
         surface.blit(rot_grid, start_pos)
+        # store starting grid
+        self._track_start = (rot_grid, start_pos)
 
     def draw_starting_grid(self, track_width):
         tile_height = START_TILE_HEIGHT # Move outside
@@ -316,33 +350,6 @@ class GameTrackGenerator():
             position = (i*tile_width, 0)
             starting_grid.blit(grid_tile, position)
         return starting_grid
-
-    def compute_checkpoint(self, points, checkpoint, debug=False):
-        # given the main point of a checkpoint, compute and draw the checkpoint box
-        margin = CHECKPOINT_MARGIN
-        radius = TRACK_WIDTH // 2 + margin
-        offset = CHECKPOINT_POINT_ANGLE_OFFSET
-        check_index = points.index(checkpoint)
-        vec_p = [
-            points[check_index + offset][1] - points[check_index][1],
-            -(points[check_index+offset][0] - points[check_index][0])
-        ]
-        n_vec_p = [
-            vec_p[0] / math.hypot(vec_p[0], vec_p[1]),
-            vec_p[1] / math.hypot(vec_p[0], vec_p[1])
-        ]
-        # compute angle
-        angle = math.degrees(math.atan2(n_vec_p[1], n_vec_p[0]))
-        # draw checkpoint
-        checkpoint = self.draw_rectangle((radius*2, 5), BLUE, line_thickness=1, fill=False)
-        rot_checkpoint = pygame.transform.rotate(checkpoint, -angle)
-        if debug:
-            rot_checkpoint.fill(RED)
-        check_pos = (
-            points[check_index][0] - math.copysign(1, n_vec_p[0])*n_vec_p[0] * radius,
-            points[check_index][1] - math.copysign(1, n_vec_p[1])*n_vec_p[1] * radius
-        )
-        return (rot_checkpoint, check_pos)
 
     def draw_rectangle(self, dimensions, color, line_thickness=1, fill=False):
         filled = line_thickness
