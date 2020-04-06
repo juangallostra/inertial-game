@@ -20,8 +20,9 @@ def main(debug=True, draw_checkpoints_in_track=True):
     background_color = GRASS_GREEN
     screen.fill(background_color)
 
+    # The track already draws itself on the screen
     track = GameTrackGenerator(screen)
-    track.generate_track(debug=False, draw_checkpoints_in_track=False)
+    track.generate_track(debug=False, draw_checkpoints_in_track=False) 
 
     pygame.display.set_caption(TITLE)
     while True: # main loop
