@@ -19,7 +19,7 @@ class GameTrackGenerator():
         # generate the track
         points = self.random_points()
         hull = ConvexHull(points)
-        track_points = self.shape_track(self.get_track_points(hull, points))
+        track_points = self.shape_track(self.get_track_points_from_hull(hull, points))
         corner_points = self.get_corners_with_kerb(track_points)
         f_points = self.smooth_track(track_points)
         # get complete corners from keypoints
@@ -28,9 +28,11 @@ class GameTrackGenerator():
         self.draw_track(self._screen, GREY, f_points, corners)
         # draw checkpoints
         checkpoints = self.get_checkpoints(f_points)
+        for checkpoint in checkpoints:
+            self._checkpoints.append(self.compute_checkpoint(f_points, checkpoint, debug))
         if draw_checkpoints_in_track or debug:
-            for checkpoint in checkpoints:
-                self.draw_checkpoint(self._screen, f_points, checkpoint, debug)
+            for checkpoint in self._checkpoints:
+                self._screen.blit(checkpoint[0], checkpoint[1])
         if debug:
             # draw the different elements that end up
             # making the track
@@ -43,7 +45,7 @@ class GameTrackGenerator():
     def get_track_points(self):
         return self._track_points
 
-    def get_checkpoints(self):
+    def get_track_checkpoints(self):
         return self._checkpoints
 
     # track generation methods
@@ -62,7 +64,7 @@ class GameTrackGenerator():
                 points.append((x, y))
         return np.array(points)
 
-    def get_track_points(self, hull, points):
+    def get_track_points_from_hull(self, hull, points):
         # get the original points from the random 
         # set that will be used as the track starting shape
         return np.array([points[hull.vertices[i]] for i in range(len(hull.vertices))])
@@ -315,7 +317,7 @@ class GameTrackGenerator():
             starting_grid.blit(grid_tile, position)
         return starting_grid
 
-    def draw_checkpoint(self, track_surface, points, checkpoint, debug=False):
+    def compute_checkpoint(self, points, checkpoint, debug=False):
         # given the main point of a checkpoint, compute and draw the checkpoint box
         margin = CHECKPOINT_MARGIN
         radius = TRACK_WIDTH // 2 + margin
@@ -339,8 +341,8 @@ class GameTrackGenerator():
         check_pos = (
             points[check_index][0] - math.copysign(1, n_vec_p[0])*n_vec_p[0] * radius,
             points[check_index][1] - math.copysign(1, n_vec_p[1])*n_vec_p[1] * radius
-        )    
-        track_surface.blit(rot_checkpoint, check_pos)
+        )
+        return (rot_checkpoint, check_pos)
 
     def draw_rectangle(self, dimensions, color, line_thickness=1, fill=False):
         filled = line_thickness
