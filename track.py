@@ -10,10 +10,42 @@ from scipy import interpolate
 from constants import *
 
 class GameTrackGenerator():
-    def __init__(self):
+    def __init__(self, screen):
         self._track_points = []
         self._checkpoints = []
-    
+        self._screen = screen
+
+    def generate_track(self, debug=False, draw_checkpoints_in_track=False):
+        # generate the track
+        points = self.random_points()
+        hull = ConvexHull(points)
+        track_points = self.shape_track(self.get_track_points(hull, points))
+        corner_points = self.get_corners_with_kerb(track_points)
+        f_points = self.smooth_track(track_points)
+        # get complete corners from keypoints
+        corners = self.get_full_corners(f_points, corner_points)
+        # draw the actual track (road, kerbs, starting grid)
+        self.draw_track(self._screen, GREY, f_points, corners)
+        # draw checkpoints
+        checkpoints = self.get_checkpoints(f_points)
+        if draw_checkpoints_in_track or debug:
+            for checkpoint in checkpoints:
+                self.draw_checkpoint(self._screen, f_points, checkpoint, debug)
+        if debug:
+            # draw the different elements that end up
+            # making the track
+            self.draw_points(self._screen, WHITE, points)
+            self.draw_convex_hull(hull, self._screen, points, RED)
+            self.draw_points(self._screen, BLUE, track_points)
+            self.draw_lines_from_points(self._screen, BLUE, track_points)    
+            self.draw_points(self._screen, BLACK, f_points)
+
+    def get_track_points(self):
+        return self._track_points
+
+    def get_checkpoints(self):
+        return self._checkpoints
+
     # track generation methods
     def random_points(self, min=MIN_POINTS, max=MAX_POINTS, margin=MARGIN, min_distance=MIN_DISTANCE):
         point_count = rn.randrange(min, max+1, 1)
@@ -213,14 +245,14 @@ class GameTrackGenerator():
     ####
     def draw_points(self, surface, color, points):
         for p in points:
-            draw_single_point(surface, color, p)
+            self.draw_single_point(surface, color, p)
 
     def draw_convex_hull(self, hull, surface, points, color):
         for i in range(len(hull.vertices)-1):
-            draw_single_line(surface, color, points[hull.vertices[i]], points[hull.vertices[i+1]])
+            self.draw_single_line(surface, color, points[hull.vertices[i]], points[hull.vertices[i+1]])
             # close the polygon
             if i == len(hull.vertices) - 2:
-                draw_single_line(
+                self.draw_single_line(
                     surface,
                     color,
                     points[hull.vertices[0]],
@@ -229,10 +261,10 @@ class GameTrackGenerator():
 
     def draw_lines_from_points(self, surface, color, points):
         for i in range(len(points)-1):
-            draw_single_line(surface, color, points[i], points[i+1])
+            self.draw_single_line(surface, color, points[i], points[i+1])
             # close the polygon
             if i == len(points) - 2:
-                draw_single_line(
+                self.draw_single_line(
                     surface,
                     color,
                     points[0],
@@ -300,7 +332,7 @@ class GameTrackGenerator():
         # compute angle
         angle = math.degrees(math.atan2(n_vec_p[1], n_vec_p[0]))
         # draw checkpoint
-        checkpoint = draw_rectangle((radius*2, 5), BLUE, line_thickness=1, fill=False)
+        checkpoint = self.draw_rectangle((radius*2, 5), BLUE, line_thickness=1, fill=False)
         rot_checkpoint = pygame.transform.rotate(checkpoint, -angle)
         if debug:
             rot_checkpoint.fill(RED)
