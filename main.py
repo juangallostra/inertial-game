@@ -8,8 +8,9 @@ from scipy.spatial import ConvexHull
 from scipy import interpolate
 
 from constants import *
-
 from track import *
+from entities import *
+
 
 ####
 ## Main function
@@ -24,12 +25,18 @@ def main(debug=True, draw_checkpoints_in_track=True):
     track = GameTrackGenerator(screen)
     track.generate_track(debug=False, draw_checkpoints_in_track=False) 
 
+    # Player
+    player = PlayerCar(RED, *track.get_track_start()[1])
+
     pygame.display.set_caption(TITLE)
     while True: # main loop
         for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN:
+                player.handle_keys(event)
             if event.type == QUIT:
                 pygame.quit()
                 sys.exit()
+        player.render(screen)
         pygame.display.update()
 
 if __name__ == '__main__':
