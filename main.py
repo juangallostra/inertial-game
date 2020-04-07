@@ -1,11 +1,5 @@
 import pygame, sys
 from pygame.locals import *
-import math
-import random as rn
-import numpy as np
-import scipy as sc
-from scipy.spatial import ConvexHull
-from scipy import interpolate
 
 from constants import *
 from track import *
@@ -23,12 +17,13 @@ def main(debug=True, draw_checkpoints_in_track=True):
 
     # The track already draws itself on the screen
     track = GameTrackGenerator(screen)
-    track.generate_track(debug=False, draw_checkpoints_in_track=False) 
+    track.generate_track(debug=debug, draw_checkpoints_in_track=draw_checkpoints_in_track) 
 
     # Player
     player = PlayerCar(RED, *track.get_track_start()[1])
 
     pygame.display.set_caption(TITLE)
+
     while True: # main loop
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN:
