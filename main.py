@@ -12,6 +12,7 @@ from entities import *
 def main(debug=True, draw_checkpoints_in_track=True):
     pygame.init()
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
+    pygame.display.set_caption(TITLE)
     background_color = GRASS_GREEN
     screen.fill(background_color)
 
@@ -20,15 +21,14 @@ def main(debug=True, draw_checkpoints_in_track=True):
     track.generate_track(debug=debug, draw_checkpoints_in_track=draw_checkpoints_in_track) 
 
     # Player
-    p_keys = {
+    player_movement_keys = {
         LEFT:pygame.K_LEFT,
         RIGHT:pygame.K_RIGHT,
         UP:pygame.K_UP, 
         DOWN:pygame.K_DOWN
     }
-    player = PlayerCar(p_keys, RED, *track.get_track_start()[1])
+    player = PlayerCar(player_movement_keys, RED, *track.get_track_start()[1])
 
-    pygame.display.set_caption(TITLE)
 
     while True: # main loop
         for event in pygame.event.get():
