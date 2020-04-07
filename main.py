@@ -20,7 +20,13 @@ def main(debug=True, draw_checkpoints_in_track=True):
     track.generate_track(debug=debug, draw_checkpoints_in_track=draw_checkpoints_in_track) 
 
     # Player
-    player = PlayerCar(RED, *track.get_track_start()[1])
+    p_keys = {
+        LEFT:pygame.K_LEFT,
+        RIGHT:pygame.K_RIGHT,
+        UP:pygame.K_UP, 
+        DOWN:pygame.K_DOWN
+    }
+    player = PlayerCar(p_keys, RED, *track.get_track_start()[1])
 
     pygame.display.set_caption(TITLE)
 

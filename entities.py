@@ -1,9 +1,12 @@
 import pygame
 from pygame.locals import *
+from constants import *
 
 class PlayerCar():
-    def __init__(self, color, x, y, inertia=[0,0]):
+    def __init__(self, keys, color, x, y, inertia=[0,0]):
+        # Keys should be a dict with keys left, right, up, down
         # set movement keys
+        self._keys = keys
         self._inertia = inertia
         self._x = x
         self._y = y
@@ -42,15 +45,19 @@ class PlayerCar():
 
     def handle_keys(self, keypress):
         # update inertia and move
-        if keypress.key == pygame.K_LEFT:
+        # if keypress.key == pygame.K_LEFT:
+        if keypress.key == self._keys[LEFT]:
             self._inertia[0] -= 1
             self.move(*self._inertia)
-        elif keypress.key == pygame.K_RIGHT:
+        # elif keypress.key == pygame.K_RIGHT:
+        elif keypress.key == self._keys[RIGHT]:
             self._inertia[0] += 1
             self.move(*self._inertia)
-        elif keypress.key == pygame.K_UP:
+        # elif keypress.key == pygame.K_UP:
+        elif keypress.key == self._keys[UP]:
             self._inertia[1] -= 1
             self.move(*self._inertia)
-        elif keypress.key == pygame.K_DOWN:
+        # elif keypress.key == pygame.K_DOWN:
+        elif keypress.key == self._keys[DOWN]:
             self._inertia[1] += 1
             self.move(*self._inertia)

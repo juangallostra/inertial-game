@@ -98,3 +98,9 @@ COOL_TRACK_SEEDS = [
     95894, 
     95521
 ]
+
+# Movement keys
+UP='up'
+DOWN='down'
+LEFT='left'
+RIGHT='right'
