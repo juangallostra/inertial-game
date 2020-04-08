@@ -36,7 +36,7 @@ def main(debug=True, draw_checkpoints_in_track=True, draw_trajectory=True):
                 pygame.quit()
                 sys.exit()
         if not draw_trajectory:
-            track.draw_track()
+            track.draw_track(debug=debug, draw_checkpoints_in_track=draw_checkpoints_in_track)
         player.render(screen)
         pygame.display.update()
 
