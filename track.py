@@ -183,8 +183,7 @@ class GameTrackGenerator():
             ny = -(points[i][1] - points[next_point][1])
             nl = math.sqrt(nx*nx + ny*ny)
             nx /= nl
-            ny /= nl 
-            # a = math.atan2(px * ny - py * nx, px * nx + py * ny)
+            ny /= nl
             a = math.atan(px * ny - py * nx)
             if (min_kerb_angle <= abs(math.degrees(a)) <= max_kerb_angle):
                 continue
@@ -274,10 +273,8 @@ class GameTrackGenerator():
             points[check_index][1] - math.copysign(1, n_vec_p[1])*n_vec_p[1] * radius
         )
         return (rot_checkpoint, check_pos)
-
-    ####
-    ## drawing functions
-    ####
+    
+    # drawing functions
     def draw_track(self, debug=False, draw_checkpoints_in_track=False):
         self._draw_track(self._screen, GREY, self._f_points, self._corners)
         if draw_checkpoints_in_track or debug:
@@ -358,8 +355,8 @@ class GameTrackGenerator():
         self._track_start = (rot_grid, start_pos)
 
     def draw_starting_grid(self, track_width):
-        tile_height = START_TILE_HEIGHT # Move outside
-        tile_width = START_TILE_WIDTH # Move outside
+        tile_height = START_TILE_HEIGHT
+        tile_width = START_TILE_WIDTH
         grid_tile = pygame.image.load(STARTING_GRID_TILE)
         starting_grid = pygame.Surface((track_width, tile_height), pygame.SRCALPHA)
         for i in range(track_width // tile_height):
@@ -427,8 +424,8 @@ class GameTrackGenerator():
                 track_surface.blit(rot_kerb, start_pos)
 
     def draw_single_kerb(self):
-        tile_height = KERB_TILE_HEIGHT # Move outside
-        tile_width = KERB_TILE_WIDTH # Move outside
+        tile_height = KERB_TILE_HEIGHT
+        tile_width = KERB_TILE_WIDTH
         kerb_tile = pygame.image.load(KERB_TILE)
         kerb = pygame.Surface((tile_width, tile_height), pygame.SRCALPHA)
         kerb.blit(kerb_tile, (0, 0))
