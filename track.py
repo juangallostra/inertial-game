@@ -12,6 +12,7 @@ from constants import *
 class GameTrackGenerator():
     def __init__(self, screen):
         self._screen = screen
+        self.background_color = GRASS_GREEN 
         
         self._track_points = []
         self._checkpoints = []
@@ -26,6 +27,9 @@ class GameTrackGenerator():
     def get_track_start(self):
         return self._track_start
 
+    def draw_track(self):
+        self._draw_track(self._screen, GREY, self._f_points, self._corners)
+
     # track generation methods
     def generate_track(self, debug=False, draw_checkpoints_in_track=False):
         # generate the track
@@ -33,15 +37,15 @@ class GameTrackGenerator():
         hull = ConvexHull(points)
         track_points = self.shape_track(self.get_track_points_from_hull(hull, points))
         corner_points = self.get_corners_with_kerb(track_points)
-        f_points = self.smooth_track(track_points)
+        self._f_points = self.smooth_track(track_points)
         # get complete corners from keypoints
-        corners = self.get_full_corners(f_points, corner_points)
+        self._corners = self.get_full_corners(self._f_points, corner_points)
         # draw the actual track (road, kerbs, starting grid)
-        self.draw_track(self._screen, GREY, f_points, corners)
+        self._draw_track(self._screen, GREY, self._f_points, self._corners)
         # draw checkpoints
-        checkpoints = self.get_checkpoints(f_points)
+        checkpoints = self.get_checkpoints(self._f_points)
         for checkpoint in checkpoints:
-            self._checkpoints.append(self.compute_checkpoint(f_points, checkpoint, debug))
+            self._checkpoints.append(self.compute_checkpoint(self._f_points, checkpoint, debug))
         if draw_checkpoints_in_track or debug:
             for checkpoint in self._checkpoints:
                 self._screen.blit(checkpoint[0], checkpoint[1])
@@ -52,7 +56,7 @@ class GameTrackGenerator():
             self.draw_convex_hull(hull, self._screen, points, RED)
             self.draw_points(self._screen, BLUE, track_points)
             self.draw_lines_from_points(self._screen, BLUE, track_points)    
-            self.draw_points(self._screen, BLACK, f_points)
+            self.draw_points(self._screen, BLACK, self._f_points)
 
     def random_points(self, min=MIN_POINTS, max=MAX_POINTS, margin=MARGIN, min_distance=MIN_DISTANCE):
         point_count = rn.randrange(min, max+1, 1)
@@ -311,7 +315,8 @@ class GameTrackGenerator():
     def draw_single_line(self, surface, color, init, end):
         pygame.draw.line(surface, color, init, end)
 
-    def draw_track(self, surface, color, points, corners):
+    def _draw_track(self, surface, color, points, corners):
+        self._screen.fill(self.background_color)
         radius = TRACK_WIDTH // 2
         # draw kerbs
         self.draw_corner_kerbs(surface, corners, radius)

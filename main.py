@@ -9,12 +9,10 @@ from entities import *
 ####
 ## Main function
 ####
-def main(debug=True, draw_checkpoints_in_track=True):
+def main(debug=True, draw_checkpoints_in_track=True, draw_trajectory=True):
     pygame.init()
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
     pygame.display.set_caption(TITLE)
-    background_color = GRASS_GREEN
-    screen.fill(background_color)
 
     # The track already draws itself on the screen
     track = GameTrackGenerator(screen)
@@ -37,9 +35,11 @@ def main(debug=True, draw_checkpoints_in_track=True):
             if event.type == QUIT:
                 pygame.quit()
                 sys.exit()
+        if not draw_trajectory:
+            track.draw_track()
         player.render(screen)
         pygame.display.update()
 
 if __name__ == '__main__':
     # rn.seed(rn.choice(COOL_TRACK_SEEDS))
-    main(debug=False, draw_checkpoints_in_track=False)
+    main(debug=False, draw_checkpoints_in_track=False, draw_trajectory=True)
