@@ -11,7 +11,7 @@ P2 = "p2"
 ####
 ## Main function
 ####
-def main(debug=True, draw_checkpoints_in_track=True, draw_trajectory=True):
+def main(debug=True, draw_checkpoints_in_track=True, draw_trajectory=True, multiplayer=False):
     pygame.init()
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
     pygame.display.set_caption(TITLE)
@@ -20,7 +20,7 @@ def main(debug=True, draw_checkpoints_in_track=True, draw_trajectory=True):
     track = GameTrackGenerator(screen)
     track.generate_track(debug=debug, draw_checkpoints_in_track=draw_checkpoints_in_track) 
 
-    # Player
+    # Players
     player_movement_keys = {
         LEFT:pygame.K_LEFT,
         RIGHT:pygame.K_RIGHT,
@@ -35,11 +35,14 @@ def main(debug=True, draw_checkpoints_in_track=True, draw_trajectory=True):
     }
 
     player = PlayerCar(player_movement_keys, RED, *track.get_track_start()[1])
-    player2 = PlayerCar(player_2_movement_keys, BLUE, *track.get_track_start()[1])
-    players = [player, player2]
+    players = [player, player]
+    turn_switch = {P1:P1, P1:P1}
+    if multiplayer:
+        player2 = PlayerCar(player_2_movement_keys, BLUE, *track.get_track_start()[1])
+        players = [player, player2]
+        turn_switch = {P1:P2, P2:P1}
 
     turn = P1
-    turn_switch = {P1:P2, P2:P1}
     
     def handle_turn(event, turn, players):
         if turn == P1:
